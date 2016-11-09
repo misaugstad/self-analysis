@@ -1,0 +1,9 @@
+# History files
+.Rhistory
+
+# Session Data files
+.RData
+
+# knitr and R markdown default cache directories
+/*_cache/
+/cache/
