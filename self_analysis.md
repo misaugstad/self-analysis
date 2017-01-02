@@ -24,12 +24,22 @@ sleep.data <- read.csv2("data/sleep_data-subset.csv")
 
 # If having trouble with loading xlsx or rJava, try running rstudio as root
 library(xlsx)
+```
 
+```
+## Loading required package: rJava
+```
+
+```
+## Loading required package: xlsxjars
+```
+
+```r
 # The read.xlsx function has not been very good at coercing the data when the
 # correct types are passed in (most of them are booleans), so I coerce almost
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
-classes <- c("Date", replicate(44, "character"))
+classes <- c("Date", replicate(45, "character"))
 self.data <- read.csv2(file = "data/self_data-subset.csv", colClasses = classes)
 ```
 
@@ -60,9 +70,9 @@ sleep.data$Date <- sleep.data$End - 1
 
 # Coerce remaining cols to correct types.
 # TODO figured out a way to do this using col names instead of indices
-binary_cols <- c(3:13,15:18,20:25,27:36,38:44)
-numeric_cols <- c(2,14,26)
-factor_cols <- c(19,37)
+binary_cols <- c(3:13,15:18,20:26,28:37,39:45)
+numeric_cols <- c(2,14,27)
+factor_cols <- c(19,38)
 for(i in binary_cols){self.data[,i] <- as.factor(as.logical(as.numeric(self.data[,i])))}
 for(i in numeric_cols){self.data[,i] <- as.numeric(self.data[,i])}
 for(i in factor_cols){self.data[,i] <- as.factor(self.data[,i])}
