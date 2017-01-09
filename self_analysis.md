@@ -70,7 +70,7 @@ sleep.data$Date <- sleep.data$End - 1
 
 # Coerce remaining cols to correct types.
 # TODO figured out a way to do this using col names instead of indices
-binary_cols <- c(3:13,15:18,20:26,28:37,39:45)
+binary_cols <- c(3:13,15:18,20:26,28:37,39:46)
 numeric_cols <- c(2,14,27)
 factor_cols <- c(19,38)
 for(i in binary_cols){self.data[,i] <- as.factor(as.logical(as.numeric(self.data[,i])))}
@@ -86,7 +86,7 @@ for(i in factor_cols){self.data[,i] <- as.factor(self.data[,i])}
 # MERGING DATASETS
 #
 
-my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date")
+my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date", all = TRUE)
 ```
 
 ## Analysis
@@ -106,3 +106,42 @@ sleep.v.sleep.qual.plot
 ```
 
 ![](figures/sleep_v_sleep_quality-1.png)<!-- -->
+
+```r
+healthy.sleep.v.sleep.qual.plot = ggplot(data = subset(my.data, my.data$sck == "FALSE"),
+                                         aes(Time.in.bed, Sleep.quality)) +
+  #geom_point() +
+  scale_x_continuous() +
+  geom_smooth() +
+  theme_bw() +
+  theme(text=element_text(size=16)) +
+  labs(title = "Effect of Hours Slept on Sleep Quality When Healthy",
+       x = "Time in Bed (Hours)", y = "Sleep Quality (Percentage)")
+healthy.sleep.v.sleep.qual.plot
+```
+
+![](figures/sleep_v_sleep_quality-2.png)<!-- -->
+
+```r
+sick.sleep.v.sleep.qual.plot = ggplot(data = subset(my.data, my.data$sck == "TRUE"),
+                                         aes(Time.in.bed, Sleep.quality)) +
+  #geom_point() +
+  scale_x_continuous() +
+  geom_smooth() +
+  theme_bw() +
+  theme(text=element_text(size=16)) +
+  labs(title = "Effect of Hours Slept on Sleep Quality When Sick",
+       x = "Time in Bed (Hours)", y = "Sleep Quality (Percentage)")
+sick.sleep.v.sleep.qual.plot
+```
+
+![](figures/sleep_v_sleep_quality-3.png)<!-- -->
+
+```r
+summary(my.data$sck)
+```
+
+```
+## FALSE  TRUE  NA's 
+##   499    26     1
+```
