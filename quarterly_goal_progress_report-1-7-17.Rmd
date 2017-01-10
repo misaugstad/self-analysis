@@ -22,7 +22,7 @@ setwd("~/Dropbox/self_analysis/")
 ```
 
 #### Reading Data
-```{r read_data, echo=TRUE, cache=TRUE}
+```{r read_data, echo=TRUE, cache=FALSE}
 #
 # READING SLEEP DATA
 #
@@ -46,7 +46,7 @@ self.data <- read.csv(file = "data/self_data-subset.csv", colClasses = classes)
 ```
 
 #### Cleaning Data
-```{r clean_data, echo=TRUE, cache=TRUE}
+```{r clean_data, echo=TRUE, cache=FALSE}
 #
 # CLEANING SLEEP DATA
 #
@@ -81,7 +81,7 @@ for(i in factor_cols){self.data[,i] <- as.factor(self.data[,i])}
 
 
 #### Merging Data
-```{r merge_data, echo=TRUE, cache=TRUE}
+```{r merge_data, echo=TRUE, cache=FALSE}
 #
 # MERGING DATASETS
 #
@@ -91,7 +91,7 @@ my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date", all = TRUE
 
 
 #### Subsetting Data
-```{r subset_data, echo=TRUE, cache=TRUE}
+```{r subset_data, echo=TRUE, cache=FALSE}
 # subsetting for first half of the current quarter
 start.date <- as.Date("2016-11-20")
 mid.date <- as.Date("2017-1-7")

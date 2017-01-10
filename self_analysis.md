@@ -133,5 +133,5 @@ summary(my.data$sck)
 
 ```
 ## FALSE  TRUE  NA's 
-##   499    26     1
+##   508    26     1
 ```
