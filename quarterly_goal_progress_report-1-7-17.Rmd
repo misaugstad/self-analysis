@@ -27,7 +27,7 @@ setwd("~/Dropbox/self_analysis/")
 # READING SLEEP DATA
 #
 
-sleep.data <- read.csv2("data/sleep_data-subset.csv")
+sleep.data <- read.csv("data/sleep_data-subset.csv")
 
 
 #
@@ -42,7 +42,7 @@ sleep.data <- read.csv2("data/sleep_data-subset.csv")
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
 classes <- c("Date", replicate(45, "character"))
-self.data <- read.csv2(file = "data/self_data-subset.csv", colClasses = classes)
+self.data <- read.csv(file = "data/self_data-subset.csv", colClasses = classes)
 ```
 
 #### Cleaning Data
@@ -52,7 +52,7 @@ self.data <- read.csv2(file = "data/self_data-subset.csv", colClasses = classes)
 #
 
 # Convert to correct data types
-sleep.data$End <- as.Date(sleep.data$End)
+sleep.data$End <- as.Date(sleep.data$End, format = "%F %T")
 sleep.data$Sleep.quality <- as.numeric(sub("%","",sleep.data$Sleep.quality))
 sleep.data$Time.in.bed <- as.difftime(as.character(sleep.data$Time.in.bed), format = "%R")
 
@@ -92,12 +92,14 @@ my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date", all = TRUE
 
 #### Subsetting Data
 ```{r subset_data, echo=TRUE, cache=TRUE}
-# subsetting for the current quarter
+# subsetting for first half of the current quarter
 start.date <- as.Date("2016-11-20")
-end.date <- as.Date("2017-2-18")
+mid.date <- as.Date("2017-1-7")
 current.date <- my.data$Date[nrow(my.data)]
-date.to.use <- min(end.date, current.date)
-weeks.passed <- (as.numeric(date.to.use - start.date) + 1) / 7
+#date.to.use <- mid.date
+date.to.use <- current.date
+weeks.passed <- (as.numeric(date.to.use - start.date) + 1.0) / 7.0
+weeks.in.quart <- 13.0
 
 quarter.data <- my.data[which(my.data$Date == start.date):which(my.data$Date == date.to.use),]
 ```
@@ -115,7 +117,8 @@ fruit.on.track
 # If not on track, show frequency needed to meet goal
 if(!fruit.on.track)
 {
-  (expected.fruit.freq * 13.0 - fruit.count) / (13.0 - weeks.passed)
+  (expected.fruit.freq * weeks.in.quart - fruit.count) /
+    (weeks.in.quart - weeks.passed)
 }
 
 # How many days per week have I been exercising on average (goal is >= 3)?
@@ -128,7 +131,8 @@ workouts.on.track
 # If not on track, show frequency needed to meet goal
 if(!workouts.on.track)
 {
-  (expected.workout.freq * 13.0 - workout.count) / (13.0 - weeks.passed)
+  (expected.workout.freq * weeks.in.quart - workout.count) /
+    (weeks.in.quart - weeks.passed)
 }
 
 # How many days per week have I been journaling on average (goal is >= 5)?
@@ -141,6 +145,7 @@ journal.on.track
 # If not on track, show frequency needed to meet goal
 if(!journal.on.track)
 {
-  (expected.journal.freq * 13.0 - journal.count) / (13.0 - weeks.passed)
+  (expected.journal.freq * weeks.in.quart - journal.count) /
+    (weeks.in.quart - weeks.passed)
 }
 ```

@@ -134,7 +134,7 @@ $(document).ready(function () {
 # READING SLEEP DATA
 #
 
-sleep.data &lt;- read.csv2(&quot;data/sleep_data-subset.csv&quot;)
+sleep.data &lt;- read.csv(&quot;data/sleep_data-subset.csv&quot;)
 
 
 #
@@ -149,7 +149,7 @@ sleep.data &lt;- read.csv2(&quot;data/sleep_data-subset.csv&quot;)
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
 classes &lt;- c(&quot;Date&quot;, replicate(45, &quot;character&quot;))
-self.data &lt;- read.csv2(file = &quot;data/self_data-subset.csv&quot;, colClasses = classes)</code></pre>
+self.data &lt;- read.csv(file = &quot;data/self_data-subset.csv&quot;, colClasses = classes)</code></pre>
 </div>
 <div id="cleaning-data" class="section level4">
 <h4>Cleaning Data</h4>
@@ -158,7 +158,7 @@ self.data &lt;- read.csv2(file = &quot;data/self_data-subset.csv&quot;, colClass
 #
 
 # Convert to correct data types
-sleep.data$End &lt;- as.Date(sleep.data$End)
+sleep.data$End &lt;- as.Date(sleep.data$End, format = &quot;%F %T&quot;)
 sleep.data$Sleep.quality &lt;- as.numeric(sub(&quot;%&quot;,&quot;&quot;,sleep.data$Sleep.quality))
 sleep.data$Time.in.bed &lt;- as.difftime(as.character(sleep.data$Time.in.bed), format = &quot;%R&quot;)
 
@@ -194,14 +194,18 @@ my.data &lt;- merge(self.data, sleep.data, by.x = &quot;Date&quot;, by.y = &quot
 </div>
 <div id="subsetting-data" class="section level4">
 <h4>Subsetting Data</h4>
-<pre class="r"><code># subsetting for the current quarter
+<pre class="r"><code># subsetting for first half of the current quarter
 start.date &lt;- as.Date(&quot;2016-11-20&quot;)
-end.date &lt;- as.Date(&quot;2017-2-18&quot;)
+mid.date &lt;- as.Date(&quot;2017-1-7&quot;)
 current.date &lt;- my.data$Date[nrow(my.data)]
-date.to.use &lt;- min(end.date, current.date)
-weeks.passed &lt;- (as.numeric(date.to.use - start.date) + 1) / 7
+#date.to.use &lt;- mid.date
+date.to.use &lt;- current.date
+weeks.passed &lt;- (as.numeric(date.to.use - start.date) + 1.0) / 7.0
+weeks.in.quart &lt;- 13.0
 
-quarter.data &lt;- my.data[which(my.data$Date == start.date):which(my.data$Date == date.to.use),]</code></pre>
+quarter.data &lt;- my.data[which(my.data$Date == start.date):which(my.data$Date == date.to.use),]
+nrow(quarter.data)</code></pre>
+<pre><code>## [1] 42</code></pre>
 </div>
 </div>
 <div id="progress-report" class="section level2">
@@ -218,7 +222,8 @@ fruit.on.track</code></pre>
 <pre class="r"><code># If not on track, show frequency needed to meet goal
 if(!fruit.on.track)
 {
-  (expected.fruit.freq * 13.0 - fruit.count) / (13.0 - weeks.passed)
+  (expected.fruit.freq * weeks.in.quart - fruit.count) /
+    (weeks.in.quart - weeks.passed)
 }</code></pre>
 <pre><code>## [1] 6</code></pre>
 <pre class="r"><code># How many days per week have I been exercising on average (goal is &gt;= 3)?
@@ -233,7 +238,8 @@ workouts.on.track</code></pre>
 <pre class="r"><code># If not on track, show frequency needed to meet goal
 if(!workouts.on.track)
 {
-  (expected.workout.freq * 13.0 - workout.count) / (13.0 - weeks.passed)
+  (expected.workout.freq * weeks.in.quart - workout.count) /
+    (weeks.in.quart - weeks.passed)
 }</code></pre>
 <pre><code>## [1] 4.285714</code></pre>
 <pre class="r"><code># How many days per week have I been journaling on average (goal is &gt;= 5)?
@@ -248,7 +254,8 @@ journal.on.track</code></pre>
 <pre class="r"><code># If not on track, show frequency needed to meet goal
 if(!journal.on.track)
 {
-  (expected.journal.freq * 13.0 - journal.count) / (13.0 - weeks.passed)
+  (expected.journal.freq * weeks.in.quart - journal.count) /
+    (weeks.in.quart - weeks.passed)
 }</code></pre>
 <pre><code>## [1] 6.714286</code></pre>
 </div>
