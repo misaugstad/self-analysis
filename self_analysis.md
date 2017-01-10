@@ -15,7 +15,7 @@ November 7, 2016
 # READING SLEEP DATA
 #
 
-sleep.data <- read.csv2("data/sleep_data-subset.csv")
+sleep.data <- read.csv("data/sleep_data-subset.csv")
 
 
 #
@@ -24,23 +24,13 @@ sleep.data <- read.csv2("data/sleep_data-subset.csv")
 
 # If having trouble with loading xlsx or rJava, try running rstudio as root
 library(xlsx)
-```
 
-```
-## Loading required package: rJava
-```
-
-```
-## Loading required package: xlsxjars
-```
-
-```r
 # The read.xlsx function has not been very good at coercing the data when the
 # correct types are passed in (most of them are booleans), so I coerce almost
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
 classes <- c("Date", replicate(45, "character"))
-self.data <- read.csv2(file = "data/self_data-subset.csv", colClasses = classes)
+self.data <- read.csv(file = "data/self_data-subset.csv", colClasses = classes)
 ```
 
 #### Cleaning Data
@@ -51,7 +41,7 @@ self.data <- read.csv2(file = "data/self_data-subset.csv", colClasses = classes)
 #
 
 # Convert to correct data types
-sleep.data$End <- as.Date(sleep.data$End)
+sleep.data$End <- as.Date(sleep.data$End, format = "%F %T")
 sleep.data$Sleep.quality <- as.numeric(sub("%","",sleep.data$Sleep.quality))
 sleep.data$Time.in.bed <- as.difftime(as.character(sleep.data$Time.in.bed), format = "%R")
 

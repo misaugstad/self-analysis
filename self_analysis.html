@@ -136,7 +136,7 @@ $(document).ready(function () {
 # READING SLEEP DATA
 #
 
-sleep.data &lt;- read.csv2(&quot;data/sleep_data-subset.csv&quot;)
+sleep.data &lt;- read.csv(&quot;data/sleep_data-subset.csv&quot;)
 
 
 #
@@ -144,15 +144,14 @@ sleep.data &lt;- read.csv2(&quot;data/sleep_data-subset.csv&quot;)
 #
 
 # If having trouble with loading xlsx or rJava, try running rstudio as root
-library(xlsx)</code></pre>
-<pre><code>## Loading required package: rJava</code></pre>
-<pre><code>## Loading required package: xlsxjars</code></pre>
-<pre class="r"><code># The read.xlsx function has not been very good at coercing the data when the
+library(xlsx)
+
+# The read.xlsx function has not been very good at coercing the data when the
 # correct types are passed in (most of them are booleans), so I coerce almost
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
 classes &lt;- c(&quot;Date&quot;, replicate(45, &quot;character&quot;))
-self.data &lt;- read.csv2(file = &quot;data/self_data-subset.csv&quot;, colClasses = classes)</code></pre>
+self.data &lt;- read.csv(file = &quot;data/self_data-subset.csv&quot;, colClasses = classes)</code></pre>
 </div>
 <div id="cleaning-data" class="section level4">
 <h4>Cleaning Data</h4>
@@ -161,7 +160,7 @@ self.data &lt;- read.csv2(file = &quot;data/self_data-subset.csv&quot;, colClass
 #
 
 # Convert to correct data types
-sleep.data$End &lt;- as.Date(sleep.data$End)
+sleep.data$End &lt;- as.Date(sleep.data$End, format = &quot;%F %T&quot;)
 sleep.data$Sleep.quality &lt;- as.numeric(sub(&quot;%&quot;,&quot;&quot;,sleep.data$Sleep.quality))
 sleep.data$Time.in.bed &lt;- as.difftime(as.character(sleep.data$Time.in.bed), format = &quot;%R&quot;)
 
