@@ -1,5 +1,5 @@
 ---
-title: "Goal Progress"
+title: "Quarterly Goal Progress Report"
 author: "Mikey Saugstad"
 date: "January 7, 2017"
 output: html_document
