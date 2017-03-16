@@ -1,16 +1,8 @@
----
-title: "Quarterly Goal Progress Report"
-author: "Mikey Saugstad"
-date: "January 7, 2017"
-output:
-  html_document: 
-    keep_md: yes
-    toc: yes
----
+# Quarterly Goal Progress Report
+Mikey Saugstad  
+January 7, 2017  
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE)
-```
+
 ## Intro
 
 This document assesses the progress that I am making towards my quarterly goals.
@@ -19,13 +11,11 @@ my frequency of exercise, eating raw fruit/veggies, and journaling.
 
 ## Data Prep
 
-```{r set_dir, echo=FALSE}
-orig.dir = getwd()
-setwd("~/Dropbox/self_analysis/")
-```
+
 
 #### Reading Data
-```{r read_data, echo=TRUE, cache=FALSE}
+
+```r
 #
 # READING SLEEP DATA
 #
@@ -49,7 +39,8 @@ self.data <- read.csv(file = "data/self_data-subset.csv", colClasses = classes)
 ```
 
 #### Cleaning Data
-```{r clean_data, echo=TRUE, cache=FALSE}
+
+```r
 #
 # CLEANING SLEEP DATA
 #
@@ -84,7 +75,8 @@ for(i in factor_cols){self.data[,i] <- as.factor(self.data[,i])}
 
 
 #### Merging Data
-```{r merge_data, echo=TRUE, cache=FALSE}
+
+```r
 #
 # MERGING DATASETS
 #
@@ -94,7 +86,8 @@ my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date", all = TRUE
 
 
 #### Subsetting Data
-```{r subset_data, echo=TRUE, cache=FALSE}
+
+```r
 # subsetting for first half of the current quarter
 start.date <- as.Date("2016-11-20")
 mid.date <- as.Date("2017-1-7")
@@ -109,46 +102,105 @@ quarter.data <- my.data[which(my.data$Date == start.date):which(my.data$Date == 
 
 
 ## Progress Report
-```{r progress_report, echo=TRUE}
+
+```r
 # How many days per week have I been eating raw fruit on average (goal is >= 5)?
 expected.fruit.freq <- 5.0
 fruit.count <- unname(summary(quarter.data$fruit)[2])
 fruit.count/weeks.passed
+```
+
+```
+## [1] 3.431373
+```
+
+```r
 # Am I currently on track?
 fruit.on.track <- fruit.count/weeks.passed >= expected.fruit.freq
 fruit.on.track
+```
+
+```
+## [1] FALSE
+```
+
+```r
 # If not on track, show frequency needed to meet goal
 if(!fruit.on.track)
 {
   (expected.fruit.freq * weeks.in.quart - fruit.count) /
     (weeks.in.quart - weeks.passed)
 }
+```
 
+```
+## [1] 7
+```
+
+```r
 # How many days per week have I been exercising on average (goal is >= 3)?
 expected.workout.freq <- 3.0
 workout.count <- unname(summary(quarter.data$ex)[2])
 workout.count/weeks.passed
+```
+
+```
+## [1] 1.647059
+```
+
+```r
 # Am I currently on track?
 workouts.on.track <- workout.count/weeks.passed >= expected.workout.freq
 workouts.on.track
+```
+
+```
+## [1] FALSE
+```
+
+```r
 # If not on track, show frequency needed to meet goal
 if(!workouts.on.track)
 {
   (expected.workout.freq * weeks.in.quart - workout.count) /
     (weeks.in.quart - weeks.passed)
 }
+```
 
+```
+## [1] 4.725
+```
+
+```r
 # How many days per week have I been journaling on average (goal is >= 5)?
 expected.journal.freq <- 5.0
 journal.count <- unname(summary(quarter.data$jour)[2])
 journal.count/weeks.passed
+```
+
+```
+## [1] 3.294118
+```
+
+```r
 # Am I currently on track?
 journal.on.track <- journal.count/weeks.passed >= expected.journal.freq
 journal.on.track
+```
+
+```
+## [1] FALSE
+```
+
+```r
 # If not on track, show frequency needed to meet goal
 if(!journal.on.track)
 {
   (expected.journal.freq * weeks.in.quart - journal.count) /
     (weeks.in.quart - weeks.passed)
 }
+```
+
+```
+## [1] 7.175
 ```
