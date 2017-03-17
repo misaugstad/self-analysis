@@ -11,6 +11,7 @@
 
 <meta name="author" content="Mikey Saugstad" />
 
+<meta name="date" content="2017-03-17" />
 
 <title>Quarterly Goal Progress Report</title>
 
@@ -118,7 +119,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Quarterly Goal Progress Report</h1>
 <h4 class="author"><em>Mikey Saugstad</em></h4>
-<h4 class="date"><em>January 7, 2017</em></h4>
+<h4 class="date"><em>March 17, 2017</em></h4>
 
 </div>
 
@@ -132,7 +133,7 @@ $(document).ready(function () {
 
 <div id="intro" class="section level2">
 <h2>Intro</h2>
-<p>This document assesses the progress that I am making towards my quarterly goals. The goals who’s progress can be measured using the data available are those on my frequency of exercise, eating raw fruit/veggies, and journaling.</p>
+<p>This document assesses the progress that I am making towards my quarterly goals for the 13-week quarter 2016-11-20 to 2017-2-18. The goals who’s progress can be measured using the data available are those on my frequency of exercise, eating raw fruit/veggies, and journaling.</p>
 </div>
 <div id="data-prep" class="section level2">
 <h2>Data Prep</h2>
@@ -156,7 +157,7 @@ sleep.data &lt;- read.csv(&quot;data/sleep_data-subset.csv&quot;)
 # correct types are passed in (most of them are booleans), so I coerce almost
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
-classes &lt;- c(&quot;Date&quot;, replicate(45, &quot;character&quot;))
+classes &lt;- c(&quot;Date&quot;, replicate(47, &quot;character&quot;))
 self.data &lt;- read.csv(file = &quot;data/self_data-subset.csv&quot;, colClasses = classes)</code></pre>
 </div>
 <div id="cleaning-data" class="section level4">
@@ -185,9 +186,9 @@ sleep.data$Date &lt;- sleep.data$End - 1
 
 # Coerce remaining cols to correct types.
 # TODO figured out a way to do this using col names instead of indices
-binary_cols &lt;- c(3:13,15:18,20:26,28:37,39:46)
-numeric_cols &lt;- c(2,14,27)
-factor_cols &lt;- c(19,38)
+binary_cols &lt;- c(3:14,16:20,22:28,30:39,41:48)
+numeric_cols &lt;- c(2,15,29)
+factor_cols &lt;- c(21,40)
 for(i in binary_cols){self.data[,i] &lt;- as.factor(as.logical(as.numeric(self.data[,i])))}
 for(i in numeric_cols){self.data[,i] &lt;- as.numeric(self.data[,i])}
 for(i in factor_cols){self.data[,i] &lt;- as.factor(self.data[,i])}</code></pre>
@@ -202,12 +203,14 @@ my.data &lt;- merge(self.data, sleep.data, by.x = &quot;Date&quot;, by.y = &quot
 </div>
 <div id="subsetting-data" class="section level4">
 <h4>Subsetting Data</h4>
-<pre class="r"><code># subsetting for first half of the current quarter
+<pre class="r"><code># subsetting for the current quarter
 start.date &lt;- as.Date(&quot;2016-11-20&quot;)
 mid.date &lt;- as.Date(&quot;2017-1-7&quot;)
+end.date &lt;- as.Date(&quot;2017-2-18&quot;)
 current.date &lt;- my.data$Date[nrow(my.data)]
 #date.to.use &lt;- mid.date
-date.to.use &lt;- current.date
+#date.to.use &lt;- current.date
+date.to.use &lt;- end.date
 weeks.passed &lt;- (as.numeric(date.to.use - start.date) + 1.0) / 7.0
 weeks.in.quart &lt;- 13.0
 
@@ -217,53 +220,52 @@ quarter.data &lt;- my.data[which(my.data$Date == start.date):which(my.data$Date 
 <div id="progress-report" class="section level2">
 <h2>Progress Report</h2>
 <pre class="r"><code># How many days per week have I been eating raw fruit on average (goal is &gt;= 5)?
-expected.fruit.freq &lt;- 5.0
+expected.fruit.freq &lt;- 4.5 #5.0 * 0.9
 fruit.count &lt;- unname(summary(quarter.data$fruit)[2])
 fruit.count/weeks.passed</code></pre>
-<pre><code>## [1] 3.431373</code></pre>
+<pre><code>## [1] 4.538462</code></pre>
 <pre class="r"><code># Am I currently on track?
 fruit.on.track &lt;- fruit.count/weeks.passed &gt;= expected.fruit.freq
 fruit.on.track</code></pre>
-<pre><code>## [1] FALSE</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 <pre class="r"><code># If not on track, show frequency needed to meet goal
-if(!fruit.on.track)
+if(!fruit.on.track &amp;&amp; date.to.use &lt; end.date)
 {
   (expected.fruit.freq * weeks.in.quart - fruit.count) /
     (weeks.in.quart - weeks.passed)
-}</code></pre>
-<pre><code>## [1] 7</code></pre>
-<pre class="r"><code># How many days per week have I been exercising on average (goal is &gt;= 3)?
-expected.workout.freq &lt;- 3.0
+}
+
+# How many days per week have I been exercising on average (goal is &gt;= 3)?
+expected.workout.freq &lt;- 2.7 #3.0 * 0.9
 workout.count &lt;- unname(summary(quarter.data$ex)[2])
 workout.count/weeks.passed</code></pre>
-<pre><code>## [1] 1.647059</code></pre>
+<pre><code>## [1] 2</code></pre>
 <pre class="r"><code># Am I currently on track?
 workouts.on.track &lt;- workout.count/weeks.passed &gt;= expected.workout.freq
 workouts.on.track</code></pre>
 <pre><code>## [1] FALSE</code></pre>
 <pre class="r"><code># If not on track, show frequency needed to meet goal
-if(!workouts.on.track)
+if(!workouts.on.track &amp;&amp; date.to.use &lt; end.date)
 {
   (expected.workout.freq * weeks.in.quart - workout.count) /
     (weeks.in.quart - weeks.passed)
-}</code></pre>
-<pre><code>## [1] 4.725</code></pre>
-<pre class="r"><code># How many days per week have I been journaling on average (goal is &gt;= 5)?
-expected.journal.freq &lt;- 5.0
+}
+
+# How many days per week have I been journaling on average (goal is &gt;= 5)?
+expected.journal.freq &lt;- 4.5 #5.0 * 0.9
 journal.count &lt;- unname(summary(quarter.data$jour)[2])
 journal.count/weeks.passed</code></pre>
-<pre><code>## [1] 3.294118</code></pre>
+<pre><code>## [1] 4.076923</code></pre>
 <pre class="r"><code># Am I currently on track?
 journal.on.track &lt;- journal.count/weeks.passed &gt;= expected.journal.freq
 journal.on.track</code></pre>
 <pre><code>## [1] FALSE</code></pre>
 <pre class="r"><code># If not on track, show frequency needed to meet goal
-if(!journal.on.track)
+if(!journal.on.track &amp;&amp; date.to.use &lt; end.date)
 {
   (expected.journal.freq * weeks.in.quart - journal.count) /
     (weeks.in.quart - weeks.passed)
 }</code></pre>
-<pre><code>## [1] 7.175</code></pre>
 </div>
 
 

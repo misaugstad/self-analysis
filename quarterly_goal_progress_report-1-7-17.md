@@ -1,13 +1,14 @@
 # Quarterly Goal Progress Report
 Mikey Saugstad  
-January 7, 2017  
+March 17, 2017  
 
 
 ## Intro
 
-This document assesses the progress that I am making towards my quarterly goals.
-The goals who's progress can be measured using the data available are those on
-my frequency of exercise, eating raw fruit/veggies, and journaling.
+This document assesses the progress that I am making towards my quarterly goals
+for the 13-week quarter 2016-11-20 to 2017-2-18. The goals who's progress can be
+measured using the data available are those on my frequency of exercise, eating
+raw fruit/veggies, and journaling.
 
 ## Data Prep
 
@@ -34,7 +35,7 @@ sleep.data <- read.csv("data/sleep_data-subset.csv")
 # correct types are passed in (most of them are booleans), so I coerce almost
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
-classes <- c("Date", replicate(45, "character"))
+classes <- c("Date", replicate(47, "character"))
 self.data <- read.csv(file = "data/self_data-subset.csv", colClasses = classes)
 ```
 
@@ -65,9 +66,9 @@ sleep.data$Date <- sleep.data$End - 1
 
 # Coerce remaining cols to correct types.
 # TODO figured out a way to do this using col names instead of indices
-binary_cols <- c(3:13,15:18,20:26,28:37,39:46)
-numeric_cols <- c(2,14,27)
-factor_cols <- c(19,38)
+binary_cols <- c(3:14,16:20,22:28,30:39,41:48)
+numeric_cols <- c(2,15,29)
+factor_cols <- c(21,40)
 for(i in binary_cols){self.data[,i] <- as.factor(as.logical(as.numeric(self.data[,i])))}
 for(i in numeric_cols){self.data[,i] <- as.numeric(self.data[,i])}
 for(i in factor_cols){self.data[,i] <- as.factor(self.data[,i])}
@@ -88,12 +89,14 @@ my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date", all = TRUE
 #### Subsetting Data
 
 ```r
-# subsetting for first half of the current quarter
+# subsetting for the current quarter
 start.date <- as.Date("2016-11-20")
 mid.date <- as.Date("2017-1-7")
+end.date <- as.Date("2017-2-18")
 current.date <- my.data$Date[nrow(my.data)]
 #date.to.use <- mid.date
-date.to.use <- current.date
+#date.to.use <- current.date
+date.to.use <- end.date
 weeks.passed <- (as.numeric(date.to.use - start.date) + 1.0) / 7.0
 weeks.in.quart <- 13.0
 
@@ -105,13 +108,13 @@ quarter.data <- my.data[which(my.data$Date == start.date):which(my.data$Date == 
 
 ```r
 # How many days per week have I been eating raw fruit on average (goal is >= 5)?
-expected.fruit.freq <- 5.0
+expected.fruit.freq <- 4.5 #5.0 * 0.9
 fruit.count <- unname(summary(quarter.data$fruit)[2])
 fruit.count/weeks.passed
 ```
 
 ```
-## [1] 3.431373
+## [1] 4.538462
 ```
 
 ```r
@@ -121,31 +124,25 @@ fruit.on.track
 ```
 
 ```
-## [1] FALSE
+## [1] TRUE
 ```
 
 ```r
 # If not on track, show frequency needed to meet goal
-if(!fruit.on.track)
+if(!fruit.on.track && date.to.use < end.date)
 {
   (expected.fruit.freq * weeks.in.quart - fruit.count) /
     (weeks.in.quart - weeks.passed)
 }
-```
 
-```
-## [1] 7
-```
-
-```r
 # How many days per week have I been exercising on average (goal is >= 3)?
-expected.workout.freq <- 3.0
+expected.workout.freq <- 2.7 #3.0 * 0.9
 workout.count <- unname(summary(quarter.data$ex)[2])
 workout.count/weeks.passed
 ```
 
 ```
-## [1] 1.647059
+## [1] 2
 ```
 
 ```r
@@ -160,26 +157,20 @@ workouts.on.track
 
 ```r
 # If not on track, show frequency needed to meet goal
-if(!workouts.on.track)
+if(!workouts.on.track && date.to.use < end.date)
 {
   (expected.workout.freq * weeks.in.quart - workout.count) /
     (weeks.in.quart - weeks.passed)
 }
-```
 
-```
-## [1] 4.725
-```
-
-```r
 # How many days per week have I been journaling on average (goal is >= 5)?
-expected.journal.freq <- 5.0
+expected.journal.freq <- 4.5 #5.0 * 0.9
 journal.count <- unname(summary(quarter.data$jour)[2])
 journal.count/weeks.passed
 ```
 
 ```
-## [1] 3.294118
+## [1] 4.076923
 ```
 
 ```r
@@ -194,13 +185,9 @@ journal.on.track
 
 ```r
 # If not on track, show frequency needed to meet goal
-if(!journal.on.track)
+if(!journal.on.track && date.to.use < end.date)
 {
   (expected.journal.freq * weeks.in.quart - journal.count) /
     (weeks.in.quart - weeks.passed)
 }
-```
-
-```
-## [1] 7.175
 ```
