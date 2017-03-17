@@ -1,0 +1,157 @@
+---
+title: "Quarterly Goal Progress Report"
+author: "Mikey Saugstad"
+date: "April 22, 2017"
+output:
+  html_document: 
+    keep_md: yes
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, error = FALSE)
+```
+## Intro
+
+This document assesses the progress that I am making towards my quarterly goals
+for the 13-week quarter 2017-3-5 to 2017-6-3. The goals who's progress can be
+measured using the data available are those on my frequency of exercise, eating
+raw fruit/veggies, and journaling.
+
+## Data Prep
+
+```{r set_dir, echo=FALSE}
+orig.dir = getwd()
+setwd("~/Dropbox/self_analysis/")
+```
+
+#### Reading Data
+```{r read_data, echo=TRUE, cache=FALSE}
+#
+# READING SLEEP DATA
+#
+
+sleep.data <- read.csv("data/sleep_data-subset.csv")
+
+
+#
+# READING SELF-RECORDED DATA
+#
+
+# If having trouble with loading xlsx or rJava, try running rstudio as root
+#library(xlsx)
+
+# The read.xlsx function has not been very good at coercing the data when the
+# correct types are passed in (most of them are booleans), so I coerce almost
+# everything to character, and then do some extra work when cleaning to get
+# it all to the correct types.
+classes <- c("Date", replicate(47, "character"))
+self.data <- read.csv(file = "data/self_data-subset.csv", colClasses = classes)
+```
+
+#### Cleaning Data
+```{r clean_data, echo=TRUE, cache=FALSE}
+#
+# CLEANING SLEEP DATA
+#
+
+# Convert to correct data types
+sleep.data$End <- as.Date(sleep.data$End, format = "%F %T")
+sleep.data$Sleep.quality <- as.numeric(sub("%","",sleep.data$Sleep.quality))
+sleep.data$Time.in.bed <- as.difftime(as.character(sleep.data$Time.in.bed), format = "%R")
+
+# Use the date when I woke up to figure out which night I went to bed; I may
+# go to sleep after midnight, so start date may not always give the correct
+# date, but I always wake up past midnight.
+sleep.data$Date <- sleep.data$End - 1
+
+
+#
+# CLEANING SELF-RECORDED DATA
+#
+
+# Optionally combine the drank coffee and took caffeine supplement
+#mydata$coffee <- as.logical(as.numeric(mydata$coffee)) | as.logical(as.numeric(mydata$caffeine))
+
+# Coerce remaining cols to correct types.
+# TODO figured out a way to do this using col names instead of indices
+binary_cols <- c(3:14,16:20,22:28,30:39,41:48)
+numeric_cols <- c(2,15,29)
+factor_cols <- c(21,40)
+for(i in binary_cols){self.data[,i] <- as.factor(as.logical(as.numeric(self.data[,i])))}
+for(i in numeric_cols){self.data[,i] <- as.numeric(self.data[,i])}
+for(i in factor_cols){self.data[,i] <- as.factor(self.data[,i])}
+```
+
+
+#### Merging Data
+```{r merge_data, echo=TRUE, cache=FALSE}
+#
+# MERGING DATASETS
+#
+
+my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date", all = TRUE)
+```
+
+
+#### Subsetting Data
+```{r subset_data, echo=TRUE, cache=FALSE}
+# subsetting for the current quarter
+start.date <- as.Date("2017-3-5")
+mid.date <- as.Date("2017-4-22")
+end.date <- as.Date("2017-6-3")
+current.date <- my.data$Date[nrow(my.data)]
+#date.to.use <- mid.date
+date.to.use <- current.date
+#date.to.use <- end.date
+weeks.passed <- (as.numeric(date.to.use - start.date) + 1.0) / 7.0
+weeks.in.quart <- 13.0
+
+quarter.data <- my.data[which(my.data$Date == start.date):which(my.data$Date == date.to.use),]
+```
+
+
+## Progress Report
+```{r progress_report, echo=TRUE}
+# How many days per week have I been eating raw fruit on average (goal is >= 5)?
+expected.fruit.freq <- 5.0
+fruit.count <- unname(summary(quarter.data$fruit)[2])
+fruit.count/weeks.passed
+# Am I currently on track?
+fruit.on.track <- fruit.count/weeks.passed >= expected.fruit.freq
+fruit.on.track
+# If not on track, show frequency needed to meet goal
+if(!fruit.on.track && date.to.use < end.date)
+{
+  (expected.fruit.freq * weeks.in.quart - fruit.count) /
+    (weeks.in.quart - weeks.passed)
+}
+
+# How many days per week have I been exercising on average (goal is >= 3)?
+expected.workout.freq <-3.0
+workout.count <- unname(summary(quarter.data$ex)[2])
+workout.count/weeks.passed
+# Am I currently on track?
+workouts.on.track <- workout.count/weeks.passed >= expected.workout.freq
+workouts.on.track
+# If not on track, show frequency needed to meet goal
+if(!workouts.on.track && date.to.use < end.date)
+{
+  (expected.workout.freq * weeks.in.quart - workout.count) /
+    (weeks.in.quart - weeks.passed)
+}
+
+# How many days per week have I been journaling on average (goal is >= 5)?
+expected.journal.freq <- 5.0
+journal.count <- unname(summary(quarter.data$jour)[2])
+journal.count/weeks.passed
+# Am I currently on track?
+journal.on.track <- journal.count/weeks.passed >= expected.journal.freq
+journal.on.track
+# If not on track, show frequency needed to meet goal
+if(!journal.on.track && date.to.use < end.date)
+{
+  (expected.journal.freq * weeks.in.quart - journal.count) /
+    (weeks.in.quart - weeks.passed)
+}
+```
