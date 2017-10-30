@@ -4,10 +4,6 @@ November 7, 2016
 
 
 
-## Data Prep
-
-
-
 #### Reading Data
 
 ```r
@@ -29,7 +25,7 @@ library(xlsx)
 # correct types are passed in (most of them are booleans), so I coerce almost
 # everything to character, and then do some extra work when cleaning to get
 # it all to the correct types.
-classes <- c("Date", replicate(45, "character"))
+classes <- c("Date", replicate(47, "character"))
 self.data <- read.csv(file = "data/self_data-subset.csv", colClasses = classes)
 ```
 
@@ -60,12 +56,12 @@ sleep.data$Date <- sleep.data$End - 1
 
 # Coerce remaining cols to correct types.
 # TODO figured out a way to do this using col names instead of indices
-binary_cols <- c(3:13,15:18,20:26,28:37,39:46)
-numeric_cols <- c(2,14,27)
-factor_cols <- c(19,38)
-for(i in binary_cols){self.data[,i] <- as.factor(as.logical(as.numeric(self.data[,i])))}
-for(i in numeric_cols){self.data[,i] <- as.numeric(self.data[,i])}
-for(i in factor_cols){self.data[,i] <- as.factor(self.data[,i])}
+binary_cols <- c(3:14,16:20,22:28,30:39,41:48)
+numeric_cols <- c(2,15,29)
+factor_cols <- c(21,40)
+for (i in binary_cols) {self.data[,i] <- as.factor(as.logical(as.numeric(self.data[,i])))}
+for (i in numeric_cols) {self.data[,i] <- as.numeric(self.data[,i])}
+for (i in factor_cols) {self.data[,i] <- as.factor(self.data[,i])}
 ```
 
 
@@ -84,12 +80,12 @@ my.data <- merge(self.data, sleep.data, by.x = "Date", by.y = "Date", all = TRUE
 
 ```r
 library(ggplot2)
-sleep.v.sleep.qual.plot = ggplot(data = my.data, aes(Time.in.bed, Sleep.quality)) +
-  #geom_point() +
+sleep.v.sleep.qual.plot =
+  ggplot(data = my.data, aes(Time.in.bed, Sleep.quality, group = sck)) +
   scale_x_continuous() +
-  geom_smooth() +
+  geom_smooth(aes(colour = sck), method = 'loess') +
   theme_bw() +
-  theme(text=element_text(size=16)) +
+  theme(text = element_text(size = 16)) +
   labs(title = "Effect of Hours Slept on Sleep Quality",
        x = "Time in Bed (Hours)", y = "Sleep Quality (Percentage)")
 sleep.v.sleep.qual.plot
@@ -98,40 +94,10 @@ sleep.v.sleep.qual.plot
 ![](figures/sleep_v_sleep_quality-1.png)<!-- -->
 
 ```r
-healthy.sleep.v.sleep.qual.plot = ggplot(data = subset(my.data, my.data$sck == "FALSE"),
-                                         aes(Time.in.bed, Sleep.quality)) +
-  #geom_point() +
-  scale_x_continuous() +
-  geom_smooth() +
-  theme_bw() +
-  theme(text=element_text(size=16)) +
-  labs(title = "Effect of Hours Slept on Sleep Quality When Healthy",
-       x = "Time in Bed (Hours)", y = "Sleep Quality (Percentage)")
-healthy.sleep.v.sleep.qual.plot
-```
-
-![](figures/sleep_v_sleep_quality-2.png)<!-- -->
-
-```r
-sick.sleep.v.sleep.qual.plot = ggplot(data = subset(my.data, my.data$sck == "TRUE"),
-                                         aes(Time.in.bed, Sleep.quality)) +
-  #geom_point() +
-  scale_x_continuous() +
-  geom_smooth() +
-  theme_bw() +
-  theme(text=element_text(size=16)) +
-  labs(title = "Effect of Hours Slept on Sleep Quality When Sick",
-       x = "Time in Bed (Hours)", y = "Sleep Quality (Percentage)")
-sick.sleep.v.sleep.qual.plot
-```
-
-![](figures/sleep_v_sleep_quality-3.png)<!-- -->
-
-```r
 summary(my.data$sck)
 ```
 
 ```
 ## FALSE  TRUE  NA's 
-##   508    26     1
+##   573    26     1
 ```
