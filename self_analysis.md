@@ -101,3 +101,41 @@ summary(my.data$sck)
 ## FALSE  TRUE  NA's 
 ##   573    26     1
 ```
+
+
+```r
+library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
+prod.v.meditation.plot =
+  ggplot(data = my.data %>% filter(!is.na(stres) & !is.na(proR)),
+         aes(as.ordered(proR), group = stres)) +
+  geom_bar() +
+  facet_grid(droplevels(stres) ~ ., scales = 'free') +
+  theme_bw() +
+  theme(panel.grid.major = element_blank()) +
+  theme(text = element_text(size = 16)) +
+  labs(title = "Effect of Stress on Productivity",
+       x = "Productivity Rating", y = "Had a Stressful Day")
+prod.v.meditation.plot
+```
+
+![](figures/productivity_v_meditation-1.png)<!-- -->
