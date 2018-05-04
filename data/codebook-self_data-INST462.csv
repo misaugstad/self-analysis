@@ -1,0 +1,43 @@
+Date;
+MITs.done;I try to write down the 3 “most important tasks” that I need to do each day. This column marks how many I completed each day.
+ate.fruit;If I ate fruit (or some other healthy snack) that day – very uncommon :)
+ate.near.bedtime;If I ate within 2 hours of going to bed.
+away.from.home;If I am traveling.
+caffeine;If I took a caffeine pill.
+coding;If some of the work I did that day involved coding.
+coursework;If some of the work I did that day involved coursework.
+personal.projects;If some of the work I did that day was on personal projects.
+day.off;If I took the day off.
+drank.coffee;If I drank coffee that day.
+energy.rating;Energy rating on a scale of 1 to 5 for the day.
+took.evening.meds;If I took prescribed adderall in the evening.
+exercised.in.afternoon;If I exercised in the afternoon.
+exercised.in.evening;If I exercised in the evening.
+exercised.in.morning;If I exercised in the morning.
+exhausted;If I felt exhausted at the end of the day.
+mood;My general mood that day. One of “good”, “neutral”, or “sad”.
+time.with.friends.or.fam;If I spent some time with friends of family.
+meditated;If I meditated.
+took.morning.meds;If I took prescribed adderall in the morning.
+took.a.nap;If I took a nap.
+on.vacation;If I was on vacation.
+spent.time.outside;If I spent some time outside.
+productive.day;If I had a productive day.
+productivity.rating;Productivity rating on a scale of 1 to 5 for the day.
+read.in.bed;If I read (not for work) before bed.
+read.during.day;If I read (not for work) throughout the day.
+sick;If I was sick that day.
+slept.in;If I slept in the night before.
+stressful.day;If I had a stressful day.
+used.phone.in.bed;If I used extensively in bed that night.
+only.vegan.food;If I ate completely vegan.
+took.vitamins;If I took my multivitamin that day.
+went.to.class;If I had class.
+worked.at.coffee.shop;If I worked at a coffee shop for part of the day.
+worked.at.home;If I worked at home for part of the day.
+worked.at.lab;If I worked in my lab or office for part of the day.
+worked.at.library;If I worked at the library for part of the day.
+exercised;If I exercised.
+wrote;If I did any sort of writing (including for work).
+gratitude;I try to write out 3 things that I am grateful for each day. If I wrote them out, this is marked as TRUE.
+journaled;If I wrote in my journal today.
