@@ -7,8 +7,158 @@ NOTE: This is not the final project; we are creating an interactive infographic 
 
 The value we want to predict is the productivity score that I gave myself each day, on a scale of 1 to 5. This is an ordinal value, so we would like to use an ordered logistic regression instead of a multinomial regression. To use this, we first need to test the proportional odds assumption.
 
-```{r reading.cleaning.data, echo=FALSE}
+We did not meet the proportional odds assumption (the code to find that is hidden, but I hope to show it later; on a deadline right now). Thus, we have to go with a multinomial regression. I binned the productivity score into <=2, 3, and >=4 so that there are more observations in each case.
+
+Below is a table of the variables that had a p-values of less than 0.05, along with their odds ratios.
+
+```{r reading.cleaning.data, echo=FALSE, message=FALSE}
+library(knitr)
+library(tidyverse)
+# library(Hmisc)
 classes <- c('Date', 'numeric', replicate(9, 'logical'), 'numeric', replicate(5, 'logical'),
              'factor', replicate(7, 'logical'), 'numeric', replicate(17, 'logical'))
-self.data <- na.omit(read.csv(file = "data/self_data-subset-INST462.csv", colClasses = classes))
+self.data <- read.csv(file = "data/self_data-subset-INST462.csv", colClasses = classes) %>%
+  dplyr::select(-worked.at.library, -productive.day, -Date, -MITs.done, -ate.near.bedtime,
+                -read.in.bed, -used.phone.in.bed, -took.morning.meds, -took.evening.meds) %>%
+  mutate(productivity.rating = factor(productivity.rating)) %>%
+  mutate(productivity.rating = fct_collapse(productivity.rating, '<=2' = c('1', '2'), '>=4' = c('4', '5'))) %>%
+  mutate(productivity.rating = relevel(productivity.rating, ref = '3')) %>%
+  mutate(mood = relevel(mood, ref = 'neutral')) %>%
+  na.omit()
 ```
+
+
+```{r multinomial.regression, echo=FALSE, message=FALSE}
+n.by.var <-
+  self.data %>%
+  mutate(moodgood = mood == 'good', moodsad = mood == 'sad', energy.rating = 1) %>%
+  select(-mood, -productivity.rating) %>%
+  summarize_all(sum) %>%
+  unlist()
+
+vars.with.variance <-
+  c(n.by.var[n.by.var > 20 & n.by.var < nrow(self.data) - 20], n.by.var['energy.rating'])
+
+vars.with.enough.variance.actual.colnames <-
+  c(names(vars.with.variance)[!(names(vars.with.variance) %in% c('moodgood', 'moodsad'))],
+    'productivity.rating')
+
+self.data.vars.with.variance <-
+  self.data %>%
+  select_at(vars.with.enough.variance.actual.colnames)
+  
+
+library(nnet)
+library(reshape2)
+test <- multinom(productivity.rating ~ ., data = self.data.vars.with.variance, trace = FALSE)
+# summary(test)
+z <- summary(test)$coefficients/summary(test)$standard.errors
+# 2-tailed z test
+p <- (1 - pnorm(abs(z), 0, 1)) * 2
+
+# variables with a significant result
+library(stringr)
+sig.vars <-
+  melt(p, value.name = 'p') %>%
+  filter(p < 0.05, Var2 != '(Intercept)') %>%
+  distinct(Var2) %>%
+  pull()
+sig.vars.orig.names <- str_remove(str_remove(sig.vars, 'TRUE'), 'good')
+
+# exp(coef(test)) gives relative risk (also called odds), i.e., the ratio of the probability of
+# choosing one outcome category over the probability of choosing the baseline category
+# exp(coef(test))
+sig.odds <- data.frame(exp(coef(test))[,sig.vars])
+
+# (exp(coef(test)) - 1)*100 gives the percent change in the odds for a one unit increase in the
+# independent variable -- "for a one point increase in energy rating, we see an 88% increase in the
+# odds of having a productivity rating of >=4 compared to a productivity rating of 3."
+# (exp(coef(test)) - 1)*100
+# ((exp(coef(test)) - 1)*100)[,sig.vars]
+
+sig.p <- data.frame(p[,sig.vars])
+names(sig.p) <- unname(sapply(str_remove(sig.vars, 'TRUE'), paste0, '-p.value'))
+names(sig.odds) <- unname(sapply(str_remove(sig.vars, 'TRUE'), paste0, '-odds'))
+sig.odds.and.p <- cbind(sig.odds, sig.p)
+sig.odds.and.p <-
+  sig.odds.and.p[, order(names(sig.odds.and.p), decreasing = FALSE)] %>%
+  rownames_to_column(var = 'productivity.rating')
+
+kable(
+  sig.odds.and.p %>%
+    gather(key, value, -productivity.rating) %>%
+    extract(key, c('variable', 'stat'), '([[:alpha:].]+)-([[:alpha:].]+)') %>%
+    spread(stat, value) %>%
+    filter(p.value < 0.05) %>%
+    select(variable, productivity.rating, odds, p.value) %>%
+    mutate(n = n.by.var[variable]) %>%
+    arrange(variable),
+  digits = 3,
+  align = 'l'
+)
+```
+
+```{r plotting.odds.ratios, fig.height=4, fig.width=10}
+```
+
+```{r, proportional.odds.assumption, fig.height=10, fig.width=8, echo=FALSE}
+# # https://stats.idre.ucla.edu/r/dae/ordinal-logistic-regression/
+# library(MASS)
+# ## fit ordered logit model and store results 'm'
+# m <- polr(productivity.rating ~ ., data = self.data, Hess = TRUE)
+# 
+# ## view a summary of the model
+# summary(m)
+# 
+# (ctable <- coef(summary(m)))
+# 
+# ## calculate and store p values
+# p <- pnorm(abs(ctable[, "t value"]), lower.tail = FALSE) * 2
+# 
+# ## combined table
+# (ctable <- cbind(ctable, "p value" = round(p, digits = 3)))
+# 
+# p.coeff <- p[names(m$coefficients)]
+# significant.estimators <- names(p.coeff[p.coeff < 0.05])
+# 
+# (ci <- confint(m)) # default method gives profiled CIs
+# 
+# confint.default(m) # CIs assuming normality
+# 
+# ## odds ratios
+# exp(coef(m)[significant.estimators])
+# 
+# ## OR and CI
+# exp(cbind(OR = coef(m), ci))
+# 
+# sf <- function(y) {
+#   c('Y>=1' = qlogis(mean(y >= 1)),
+#     'Y>=2' = qlogis(mean(y >= 2)),
+#     'Y>=3' = qlogis(mean(y >= 3)),
+#     'Y>=4' = qlogis(mean(y >= 4)),
+#     'Y>=5' = qlogis(mean(y >= 5)))
+# }
+# # (s <- with(self.data, summary(as.formula(paste('as.numeric(productivity.rating) ~',
+# #                                                paste(significant.estimators, collapse = ' + ')), fun = sf)))
+# (s <- with(self.data,
+#            summary(as.numeric(productivity.rating) ~ coding + energy.rating + exhausted + mood +
+#                      slept.in + went.to.class + worked.at.home + worked.at.lab,
+#                    fun = sf)))
+# 
+# s[, 6] <- s[, 6] - s[, 5]
+# s[, 5] <- s[, 5] - s[, 4]
+# s[, 4] <- s[, 4] - s[, 3]
+# s[, 3] <- s[, 3] - s[, 3]
+# s
+# 
+# plot(s, which = 1:5, xlab = 'logit', main = ' ', xlim = range(s[,3:6], finite = TRUE))
+# 
+# library(brant)
+# brant(m, by.var = TRUE)
+# 
+# data = MASS::survey
+# data$Smoke = ordered(MASS::survey$Smoke, levels = c("Never","Occas","Regul","Heavy"))
+# model1 = MASS::polr(Smoke ~ Sex + Height, data = data, Hess = TRUE)
+# brant(model1)
+```
+
