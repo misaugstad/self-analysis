@@ -12,8 +12,12 @@ We did not meet the proportional odds assumption (the code to find that is hidde
 Below is a table of the variables that had a p-values of less than 0.05, along with their odds ratios.
 
 ```{r reading.cleaning.data, echo=FALSE, message=FALSE}
+set.seed(6666)
 library(knitr)
 library(tidyverse)
+library(caret)
+library(nnet)
+library(reshape2)
 # library(Hmisc)
 classes <- c('Date', 'numeric', replicate(9, 'logical'), 'numeric', replicate(5, 'logical'),
              'factor', replicate(7, 'logical'), 'numeric', replicate(17, 'logical'))
@@ -25,10 +29,7 @@ self.data <- read.csv(file = "data/self_data-subset-INST462.csv", colClasses = c
   mutate(productivity.rating = relevel(productivity.rating, ref = '3')) %>%
   mutate(mood = relevel(mood, ref = 'neutral')) %>%
   na.omit()
-```
 
-
-```{r multinomial.regression, echo=FALSE, message=FALSE}
 n.by.var <-
   self.data %>%
   mutate(moodgood = mood == 'good', moodsad = mood == 'sad', energy.rating = 1) %>%
@@ -41,18 +42,51 @@ vars.with.variance <-
 
 vars.with.enough.variance.actual.colnames <-
   c(names(vars.with.variance)[!(names(vars.with.variance) %in% c('moodgood', 'moodsad'))],
-    'productivity.rating')
+    'productivity.rating',
+    'mood')
 
 self.data.vars.with.variance <-
   self.data %>%
   select_at(vars.with.enough.variance.actual.colnames)
-  
 
-library(nnet)
-library(reshape2)
-test <- multinom(productivity.rating ~ ., data = self.data.vars.with.variance, trace = FALSE)
+train.indices <- sample(seq_len(nrow(self.data.vars.with.variance)),
+                        size = floor(0.75 * nrow(self.data.vars.with.variance)))
+train.data <- self.data.vars.with.variance[train.indices,]
+test.data <- self.data.vars.with.variance[-train.indices,]
+```
+
+```{r plotting.odds.ratios, fig.height=4, fig.width=10, echo=FALSE}
+# reference: http://amunategui.github.io/multinomial-neuralnetworks-walkthrough/
+totalAccuracy <- c()
+cv <- 10
+cvDivider <- floor(nrow(self.data.vars.with.variance) / (cv + 1))
+
+for (cv in seq(1:cv)) {
+  train.indices <- sample(seq_len(nrow(self.data.vars.with.variance)),
+                          size = floor(0.75 * nrow(self.data.vars.with.variance)))
+  dataTrain <- self.data.vars.with.variance[train.indices,]
+  dataTest <- self.data.vars.with.variance[-train.indices,]
+
+  prodModel <- multinom(productivity.rating ~ ., data = dataTrain, maxit = 1000, trace = FALSE)
+
+  pred <- predict(prodModel, newdata = dataTest, type = "class")
+
+  #  classification error
+  cv_ac <- postResample(dataTest$productivity.rating, pred)[[1]]
+  # print(paste('Current Accuracy:', cv_ac, 'for CV:', cv))
+  totalAccuracy <- c(totalAccuracy, cv_ac)
+}
+mean(totalAccuracy)
+
+preds <- predict(prodModel, type = "class", newdata = dataTest)
+postResample(dataTest$productivity.rating, preds)
+confusionMatrix(table(dataTest$productivity.rating, preds))[c('overall', 'table')]
+```
+
+
+```{r multinomial.regression, echo=FALSE, message=FALSE}
 # summary(test)
-z <- summary(test)$coefficients/summary(test)$standard.errors
+z <- summary(prodModel)$coefficients/summary(prodModel)$standard.errors
 # 2-tailed z test
 p <- (1 - pnorm(abs(z), 0, 1)) * 2
 
@@ -65,16 +99,16 @@ sig.vars <-
   pull()
 sig.vars.orig.names <- str_remove(str_remove(sig.vars, 'TRUE'), 'good')
 
-# exp(coef(test)) gives relative risk (also called odds), i.e., the ratio of the probability of
+# exp(coef(prodModel)) gives relative risk (also called odds), i.e., the ratio of the probability of
 # choosing one outcome category over the probability of choosing the baseline category
-# exp(coef(test))
-sig.odds <- data.frame(exp(coef(test))[,sig.vars])
+# exp(coef(prodModel))
+sig.odds <- data.frame(exp(coef(prodModel))[,sig.vars])
 
-# (exp(coef(test)) - 1)*100 gives the percent change in the odds for a one unit increase in the
+# (exp(coef(prodModel)) - 1)*100 gives the percent change in the odds for a one unit increase in the
 # independent variable -- "for a one point increase in energy rating, we see an 88% increase in the
 # odds of having a productivity rating of >=4 compared to a productivity rating of 3."
-# (exp(coef(test)) - 1)*100
-# ((exp(coef(test)) - 1)*100)[,sig.vars]
+# (exp(coef(prodModel)) - 1)*100
+# ((exp(coef(prodModel)) - 1)*100)[,sig.vars]
 
 sig.p <- data.frame(p[,sig.vars])
 names(sig.p) <- unname(sapply(str_remove(sig.vars, 'TRUE'), paste0, '-p.value'))
@@ -96,9 +130,6 @@ kable(
   digits = 3,
   align = 'l'
 )
-```
-
-```{r plotting.odds.ratios, fig.height=4, fig.width=10}
 ```
 
 ```{r, proportional.odds.assumption, fig.height=10, fig.width=8, echo=FALSE}

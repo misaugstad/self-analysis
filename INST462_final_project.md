@@ -9,12 +9,33 @@ We did not meet the proportional odds assumption (the code to find that is hidde
 
 Below is a table of the variables that had a p-values of less than 0.05, along with their odds ratios.
 
+    ## [1] 0.6166667
+
+    ##  Accuracy     Kappa 
+    ## 0.6666667 0.4545024
+
+    ## $overall
+    ##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+    ##   6.666667e-01   4.545024e-01   5.833609e-01   7.429546e-01   5.000000e-01 
+    ## AccuracyPValue  McnemarPValue 
+    ##   3.899557e-05   7.922911e-01 
+    ## 
+    ## $table
+    ##      preds
+    ##        3 <=2 >=4
+    ##   3   49  10  14
+    ##   <=2 10  14   0
+    ##   >=4 13   1  33
+
 | variable       | productivity.rating | odds  | p.value | n   |
 |:---------------|:--------------------|:------|:--------|:----|
-| away.from.home | &gt;=4              | 0.325 | 0.033   | 102 |
-| coding         | &lt;=2              | 0.411 | 0.004   | 285 |
-| energy.rating  | &lt;=2              | 0.220 | 0.000   | 576 |
-| energy.rating  | &gt;=4              | 3.368 | 0.000   | 576 |
-| exhausted      | &lt;=2              | 0.352 | 0.000   | 248 |
-| went.to.class  | &gt;=4              | 2.433 | 0.005   | 103 |
-| worked.at.home | &lt;=2              | 0.520 | 0.040   | 351 |
+| away.from.home | &gt;=4              | 0.242 | 0.035   | 102 |
+| coding         | &lt;=2              | 0.372 | 0.007   | 285 |
+| energy.rating  | &lt;=2              | 0.294 | 0.000   | 576 |
+| energy.rating  | &gt;=4              | 1.835 | 0.012   | 576 |
+| exhausted      | &lt;=2              | 0.394 | 0.011   | 248 |
+| moodgood       | &lt;=2              | 0.255 | 0.005   | 255 |
+| moodgood       | &gt;=4              | 6.181 | 0.000   | 255 |
+| moodsad        | &gt;=4              | 0.000 | 0.000   | 32  |
+| on.vacation    | &gt;=4              | 4.716 | 0.043   | 61  |
+| slept.in       | &gt;=4              | 0.453 | 0.033   | 182 |
