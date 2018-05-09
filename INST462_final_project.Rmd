@@ -171,7 +171,8 @@ ggplot(unproductive.data.with.errorbars, aes(x = odds, y = variable)) +
         axis.title = element_text(size = 14)) +
   scale_x_log10() +
   ylab("") +
-  xlab("Odds ratios - Unproductive Day (<=2; log scale)")
+  xlab("Odds ratios (log scale)") +
+  ggtitle('Factors of an Unproductive Day')
 
 
 productive.data.with.errorbars <-
@@ -199,7 +200,8 @@ ggplot(productive.data.with.errorbars, aes(x = odds, y = variable)) +
         axis.title = element_text(size = 14)) +
   scale_x_log10() +
   ylab("") +
-  xlab("Odds ratios - Productive Day (>=4; log scale)")
+  xlab("Odds ratios (log scale)") +
+  ggtitle('Factors of a Productive Day')
 ```
 
 ```{r, proportional.odds.assumption, fig.height=10, fig.width=8, echo=FALSE}
