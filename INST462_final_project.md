@@ -39,3 +39,5 @@ Below is a table of the variables that had a p-values of less than 0.05, along w
 | moodsad        | &gt;=4              | 0.000 | 0.000   | 32  |
 | on.vacation    | &gt;=4              | 4.716 | 0.043   | 61  |
 | slept.in       | &gt;=4              | 0.453 | 0.033   | 182 |
+
+![](INST462_final_project_files/figure-markdown_github/plotting.odds.ratios-1.png)![](INST462_final_project_files/figure-markdown_github/plotting.odds.ratios-2.png)
