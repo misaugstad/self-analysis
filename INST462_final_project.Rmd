@@ -156,8 +156,10 @@ unproductive.data.with.errorbars <-
   arrange(variable) %>%
   filter(variable != 'moodsad') %>%
   mutate(variable = fct_recode(variable,
-                               'energy rating (1-5)' = 'energy.rating',
-                               'mood - good' = 'moodgood'))
+                               'Coding'              = 'coding',
+                               'Energy rating (1-5)' = 'energy.rating',
+                               'Exhausted'           = 'exhausted',
+                               'Mood - good'         = 'moodgood'))
 
 ggplot(unproductive.data.with.errorbars, aes(x = odds, y = variable)) +
   geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") +
@@ -181,11 +183,11 @@ productive.data.with.errorbars <-
   arrange(variable) %>%
   filter(variable != 'moodsad') %>%
   mutate(variable = fct_recode(variable,
-                               'energy rating (1-5)' = 'energy.rating',
-                               'mood - good' = 'moodgood',
-                               'out of town' = 'away.from.home',
-                               'on vacation' = 'on.vacation',
-                               'slept in' = 'slept.in'))
+                               'Energy rating (1-5)' = 'energy.rating',
+                               'Mood - good' = 'moodgood',
+                               'Out of town' = 'away.from.home',
+                               'On vacation' = 'on.vacation',
+                               'Slept in' = 'slept.in'))
 
 ggplot(productive.data.with.errorbars, aes(x = odds, y = variable)) +
   geom_vline(aes(xintercept = 1), size = .25, linetype = "dashed") +
